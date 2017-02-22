@@ -1,29 +1,12 @@
 package com.ecgreb.losttest;
 
-import com.mapzen.android.lost.api.LocationRequest;
-import com.mapzen.android.lost.api.LostApiClient;
-
-import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
-public class MainActivity extends AppCompatActivity implements SingleLocationRequest.Callback,
-    LostApiClient.ConnectionCallbacks {
-
-  LostApiClient lostApiClient;
+public class MainActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +15,8 @@ public class MainActivity extends AppCompatActivity implements SingleLocationReq
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-            .setAction("Action", null).show();
-        new SingleLocationRequest(MainActivity.this)
-            .startRequest(LocationRequest.PRIORITY_HIGH_ACCURACY, MainActivity.this);
-      }
-    });
-
-    if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(this, new String[]{ ACCESS_FINE_LOCATION}, 0);
-    } else {
-      initLostApiClient();
-    }
+    new ConnectThenDisconnect(this);
+    new ConnectThenDisconnect(this);
   }
 
   @Override
@@ -63,26 +32,5 @@ public class MainActivity extends AppCompatActivity implements SingleLocationReq
     }
 
     return super.onOptionsItemSelected(item);
-  }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-      @NonNull int[] grantResults) {
-    initLostApiClient();
-  }
-
-  @Override public void onLocation(Location location) {
-    Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
-  }
-
-  private void initLostApiClient() {
-    lostApiClient = new LostApiClient.Builder(this).addConnectionCallbacks(this).build();
-    lostApiClient.connect();
-  }
-
-  @Override public void onConnected() {
-  }
-
-  @Override public void onConnectionSuspended() {
   }
 }
