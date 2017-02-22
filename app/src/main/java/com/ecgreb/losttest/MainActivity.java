@@ -1,8 +1,8 @@
 package com.ecgreb.losttest;
 
 import com.mapzen.android.lost.api.LocationRequest;
+import com.mapzen.android.lost.api.LostApiClient;
 
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,7 +20,10 @@ import android.widget.Toast;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-public class MainActivity extends AppCompatActivity implements SingleLocationRequest.Callback {
+public class MainActivity extends AppCompatActivity implements SingleLocationRequest.Callback,
+    LostApiClient.ConnectionCallbacks {
+
+  LostApiClient lostApiClient;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements SingleLocationReq
 
     if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
         ActivityCompat.requestPermissions(this, new String[]{ ACCESS_FINE_LOCATION}, 0);
+    } else {
+      initLostApiClient();
     }
   }
 
@@ -63,9 +68,21 @@ public class MainActivity extends AppCompatActivity implements SingleLocationReq
   @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
       @NonNull int[] grantResults) {
+    initLostApiClient();
   }
 
   @Override public void onLocation(Location location) {
     Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
+  }
+
+  private void initLostApiClient() {
+    lostApiClient = new LostApiClient.Builder(this).addConnectionCallbacks(this).build();
+    lostApiClient.connect();
+  }
+
+  @Override public void onConnected() {
+  }
+
+  @Override public void onConnectionSuspended() {
   }
 }
